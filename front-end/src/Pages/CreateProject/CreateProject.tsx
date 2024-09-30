@@ -71,7 +71,6 @@ const CreateProject:React.FC = () => {
       setShowPromptAccount(true)
       return
     }
-    // TODO check form errors
     if (checkFormError(noErrorObj, formData, setFormFieldError)) {
       return
     }

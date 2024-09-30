@@ -146,3 +146,58 @@ func (self *Repository) FindManyByPage(coll string, results interface{}, pageNum
 	}
 	return hasNext, nil
 }
+
+func (self *Repository) FindManyByJunction(coll string, fromKey string, fromKeyVal primitive.ObjectID, toKey string, toColl string, 
+											pageNum int, pageSize int, results interface{}) (bool, error) {
+	skip := (pageNum - 1) * pageSize
+	newRoot := fmt.Sprintf("$%s", toColl)
+	pipeline := mongo.Pipeline{
+		{{"$match", bson.D{{fromKey, fromKeyVal}}}},
+		{{"$lookup", bson.D{
+			{"from", toColl},              
+			{"localField", toKey},      
+			{"foreignField", "_id"},           
+			{"as", toColl},                
+		}}},
+		{{"$unwind", newRoot}},
+		{{"$replaceRoot", bson.D{{"newRoot", newRoot}}}},
+		{{"$skip", skip}},                    
+		{{"$limit", pageSize+1}},                
+	}
+
+	cursor, err := self.getCollection(coll).Aggregate(context.TODO(), pipeline)
+	if err != nil {
+		return false, err
+	}
+	defer cursor.Close(context.TODO())
+
+    // Get the reflect Value of results (which should be a pointer to a slice)
+    sliceValue := reflect.ValueOf(results)
+    if sliceValue.Kind() != reflect.Ptr || sliceValue.Elem().Kind() != reflect.Slice {
+        return false, fmt.Errorf("results argument must be a pointer to a slice")
+    }
+
+    sliceElemType := sliceValue.Elem().Type().Elem()
+	count := 0
+    for cursor.Next(context.TODO()) {
+		count++
+		if count <= pageSize {
+			result := reflect.New(sliceElemType).Elem()
+	
+			if err := cursor.Decode(result.Addr().Interface()); err != nil {
+				fmt.Printf(err.Error())
+				return false, err
+			}
+	
+			sliceValue.Elem().Set(reflect.Append(sliceValue.Elem(), result))
+		}
+    }
+
+	var hasNext bool
+	if count == pageSize+1 {
+		hasNext = true
+	} else {
+		hasNext = false
+	}
+	return hasNext, nil
+}

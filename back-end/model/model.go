@@ -8,7 +8,7 @@ import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type Model interface{}
 
-type UserCheck struct {
+type IdObj struct {
 	Id primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
 }
 
@@ -56,4 +56,3 @@ type ProjectRequest struct {
 	// Kind: “application” || “invite”
 	// Rejected: bool
 	}
-	

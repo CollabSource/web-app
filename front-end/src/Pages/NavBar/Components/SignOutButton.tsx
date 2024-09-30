@@ -12,7 +12,7 @@ const SignOutButton: React.FC = () => {
 
     return(
         <div>
-            <button onClick={() => signOut()}>Sign Out</button>
+            <button id='sign-out-button' onClick={() => signOut()}>Sign Out</button>
         </div>
     );
 }

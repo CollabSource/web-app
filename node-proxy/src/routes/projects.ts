@@ -25,7 +25,6 @@ router.post('/', async (req: Request, res: Response) => {
   const size = req.query.size
   try {
     const projectQuery: ProjectFilter = req.body
-    console.log(req.body)
     const response: AxiosResponse<PaginatedResponseBody<Project>> = await axiosBase.post<PaginatedResponseBody<Project>>(`${PROJECT_BASE_PATH}?page=${page}&size=${size}`, projectQuery, { headers });
     const project: PaginatedResponseBody<Project> = response.data;
     res.status(200).json(project)

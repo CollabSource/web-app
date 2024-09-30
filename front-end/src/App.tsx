@@ -5,6 +5,9 @@ import NavBar from './Pages/NavBar/NavBar';
 import CreateProject from './Pages/CreateProject/CreateProject';
 import ProjectPage from './Pages/ProjectPage/ProjectPage';
 import ErrorPage from './error-page';
+import User from './Pages/User/User'
+
+
 import {
   createBrowserRouter,
   RouterProvider,
@@ -37,6 +40,11 @@ const router = createBrowserRouter([
     element: <CreateProject/>,
     errorElement: <ErrorPage/>
   },
+  {
+    path: "/user/:id",
+    element: <User/>,
+    errorElement: <ErrorPage/>
+  }
 ]);
 
 function App() {
